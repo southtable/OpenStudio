@@ -1154,7 +1154,7 @@ jobs:
             arch: x86_64
             python-arch: x64
             allow_failure: false
-            max_jobs: 4
+            max_jobs: 16
             exclude_regex: "BCLFixture[.](RemoteBCL_BCLSearchResult|LocalBCL_AuthKey|RemoteBCLTest2?|GetComponentByUID|RemoteBCLMetaSearchTest|RemoteBCL_EncodingURI)|CLITest-test_bundle-(bundle|bundle_git|bundle_native_embedded)|OpenStudioCLI.*|MeasureFixture.*"
     defaults:
       run:
