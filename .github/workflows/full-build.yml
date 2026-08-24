@@ -3,20 +3,7 @@ name: Full Build
 on:
   push:
     branches:
-      - develop
-      - master
-      - os-4.0-dev
-    tags:
-      - "v*"
-  schedule:
-    # Run nightly at 8 PM ET (midnight UTC during EST, 1 AM UTC during EDT)
-    # Using 1 AM UTC to cover EDT (daylight saving time)
-    - cron: '0 1 * * *'
-  pull_request:
-    branches:
-      - develop
-      - master
-      - os-4.0-dev
+      - os-4.0-dev-1
 
     types: [ opened, reopened, synchronize ]
   workflow_dispatch:
@@ -96,37 +83,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: centos-9-x64
-            pretty: CentOS 9 (AlmaLinux) x64
-            os: ubuntu-22.04
-            container_image: nrel/openstudio-cmake-tools:almalinux9-main
-            container_options: "--privileged -u root -e LANG=en_US.UTF-8"
-            test_suffix: CentOS-9
-            pip_package: false
-            docker_trigger: false
-            upload_globs: |
-              *.rpm
-              *OpenStudio*x86_64.tar.gz
-            cpack_generators: "RPM;TGZ"
-            max_jobs: 4
-            exclude_regex: "BCLFixture[.](RemoteBCL_BCLSearchResult|LocalBCL_AuthKey|RemoteBCLTest2?|GetComponentByUID|RemoteBCLMetaSearchTest|RemoteBCL_EncodingURI)|CLITest-test_bundle-(bundle|bundle_git|bundle_native_embedded)|OpenStudioCLI.*|MeasureFixture.*"
-          - platform: ubuntu-2204-x64
-            pretty: Ubuntu 22.04 x64
-            os: ubuntu-22.04
-            container_image: nrel/openstudio-cmake-tools:jammy-main
-            container_options: "--privileged -u root -e LANG=en_US.UTF-8"
-            test_suffix: Ubuntu-2204
-            pip_package: true
-            docker_trigger: true
-            upload_globs: |
-              *.deb
-              *OpenStudio*x86_64.tar.gz
-            cpack_generators: "DEB;TGZ"
-            max_jobs: 3
-            exclude_regex: "ModelFixture.PythonPluginInstance_NotPYFile|BCLFixture[.](RemoteBCL_BCLSearchResult|LocalBCL_AuthKey|RemoteBCLTest2?|GetComponentByUID|RemoteBCLMetaSearchTest|RemoteBCL_EncodingURI)|CLITest-test_bundle-(bundle|bundle_git|bundle_native_embedded)|OpenStudioCLI.*|MeasureFixture.*"
           - platform: ubuntu-2404-x64
             pretty: Ubuntu 24.04 x64
-            os: ubuntu-24.04
+            os: linux-x86_64
             container_image: nrel/openstudio-cmake-tools:noble-main
             container_options: "--privileged -u root -e LANG=en_US.UTF-8"
             test_suffix: Ubuntu-2404
@@ -138,36 +97,6 @@ jobs:
             cpack_generators: "DEB;TGZ"
             max_jobs: 4
             exclude_regex: "BCLFixture[.](RemoteBCL_BCLSearchResult|LocalBCL_AuthKey|RemoteBCLTest2?|GetComponentByUID|RemoteBCLMetaSearchTest|RemoteBCL_EncodingURI)|CLITest-test_bundle-(bundle|bundle_git|bundle_native_embedded)|OpenStudioCLI.*|MeasureFixture.*"
-          - platform: ubuntu-2204-arm64
-            pretty: Ubuntu 22.04 ARM64
-            os: ubuntu-22.04-arm
-            container_image: nrel/openstudio-cmake-tools:jammy-main
-            container_options: "--privileged -u root -e LANG=en_US.UTF-8"
-            test_suffix: Ubuntu-2204-ARM64
-            pip_package: false
-            docker_trigger: false
-            upload_globs: |
-              *.deb
-              *OpenStudio*arm64.tar.gz
-            cpack_generators: "DEB;TGZ"
-            max_jobs: 3
-            # SqlFileFixture.AnnualTotalCosts needed until E+ itself disables ffp-contract on arm64 GCC
-            exclude_regex: "SqlFileFixture.AnnualTotalCosts|BCLFixture[.](RemoteBCL_BCLSearchResult|LocalBCL_AuthKey|RemoteBCLTest2?|GetComponentByUID|RemoteBCLMetaSearchTest|RemoteBCL_EncodingURI)|CLITest-test_bundle-(bundle|bundle_git|bundle_native_embedded)|OpenStudioCLI.*|MeasureFixture.*"
-          - platform: ubuntu-2404-arm64
-            pretty: Ubuntu 24.04 ARM64
-            os: ubuntu-24.04-arm
-            container_image: nrel/openstudio-cmake-tools:noble-main
-            container_options: "--privileged -u root -e LANG=en_US.UTF-8"
-            test_suffix: Ubuntu-2404-ARM64
-            pip_package: false
-            docker_trigger: false
-            upload_globs: |
-              *.deb
-              *OpenStudio*arm64.tar.gz
-            cpack_generators: "DEB;TGZ"
-            max_jobs: 4
-            # SqlFileFixture.AnnualTotalCosts needed until E+ itself disables ffp-contract on arm64 GCC
-            exclude_regex: "SqlFileFixture.AnnualTotalCosts|BCLFixture[.](RemoteBCL_BCLSearchResult|LocalBCL_AuthKey|RemoteBCLTest2?|GetComponentByUID|RemoteBCLMetaSearchTest|RemoteBCL_EncodingURI)|CLITest-test_bundle-(bundle|bundle_git|bundle_native_embedded)|OpenStudioCLI.*|MeasureFixture.*"
     defaults:
       run:
         shell: bash
@@ -636,10 +565,7 @@ jobs:
 
   macos-build:
     name: Build Packages for ${{ matrix.pretty }}
-    if: |
-      (!inputs.jobs || contains(inputs.jobs, 'macos-build')) &&
-      (github.event_name == 'push' || github.event_name == 'schedule' ||
-       (github.event_name == 'pull_request' && (github.base_ref == 'develop' || github.base_ref == 'master' || github.base_ref == 'os-4.0-dev')))
+    if: false
     runs-on: ${{ matrix.os }}
     timeout-minutes: 720
     continue-on-error: ${{ matrix.allow_failure }}
@@ -1208,10 +1134,7 @@ jobs:
 
   windows-build:
     name: Build ${{ matrix.pretty }}
-    if: |
-      (!inputs.jobs || contains(inputs.jobs, 'windows-build')) &&
-      (github.event_name == 'push' || github.event_name == 'schedule' ||
-       (github.event_name == 'pull_request' && (github.base_ref == 'develop' || github.base_ref == 'master' || github.base_ref == 'os-4.0-dev')))
+    if: false
     runs-on: ${{ matrix.os }}
     timeout-minutes: 720
     strategy:
