@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - os-4.0-dev-1
+  pull_request:
+    branches:
+      - develop
+      - master
+      - os-4.0-dev
 
     types: [ opened, reopened, synchronize ]
   workflow_dispatch:
