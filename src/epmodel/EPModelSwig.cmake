@@ -159,7 +159,11 @@ macro(make_epmodel_swig_bindings NAME SIMPLENAME KEY_I_FILE I_FILES PARENT_TARGE
     target_include_directories(${python_target} PRIVATE ${common_swig_include_dirs})
     target_include_directories(${python_target} SYSTEM PRIVATE ${Python_INCLUDE_DIRS})
     target_compile_definitions(${python_target} PRIVATE SHARED_OS_LIBS SWIG_PYTHON_SILENT_MEMLEAK)
-    target_link_libraries(${python_target} PUBLIC ${PARENT_TARGET} ${${PARENT_TARGET}_depends})
+    if(MSVC)
+      target_link_libraries(${python_target} PUBLIC openstudioepmodellib ${${PARENT_TARGET}_depends})
+    else()
+      target_link_libraries(${python_target} PUBLIC ${PARENT_TARGET} ${${PARENT_TARGET}_depends})
+    endif()
     add_dependencies(${python_target} ${PARENT_TARGET})
 
     if(MSVC)
