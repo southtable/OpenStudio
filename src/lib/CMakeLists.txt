@@ -18,6 +18,7 @@ if(MSVC)
    PRIVATE
    openstudio_model
    openstudio_energyplus
+  openstudio_osversion
    PUBLIC
    openstudioutilitieslib
   )
@@ -40,7 +41,6 @@ if(MSVC)
    openstudio_epjson
    openstudio_alfalfa
    openstudio_measure
-   openstudio_osversion
    openstudio_sdd
    openstudio_isomodel
    openstudio_gbxml
