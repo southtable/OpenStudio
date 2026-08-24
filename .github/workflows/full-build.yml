@@ -76,10 +76,7 @@ env:
 jobs:
   linux-build:
     name: Build ${{ matrix.pretty }}
-    if: |
-      (!inputs.jobs || contains(inputs.jobs, 'linux-build')) &&
-      (github.event_name == 'push' || github.event_name == 'schedule' ||
-       (github.event_name == 'pull_request' && (github.base_ref == 'develop' || github.base_ref == 'master' || github.base_ref == 'os-4.0-dev')))
+    if: false
     runs-on: ${{ matrix.os }}
     container:
       image: ${{ matrix.container_image }}
@@ -1139,7 +1136,10 @@ jobs:
 
   windows-build:
     name: Build ${{ matrix.pretty }}
-    if: false
+    if: |
+      (!inputs.jobs || contains(inputs.jobs, 'windows-build')) &&
+      (github.event_name == 'push' || github.event_name == 'schedule' ||
+       (github.event_name == 'pull_request' && (github.base_ref == 'develop' || github.base_ref == 'master' || github.base_ref == 'os-4.0-dev')))
     runs-on: ${{ matrix.os }}
     timeout-minutes: 720
     strategy:
@@ -1148,7 +1148,7 @@ jobs:
         include:
           - platform: windows-2022-x64
             pretty: Windows 2022 x64
-            os: windows-2022
+            os: windows-2022-x86_64
             test_suffix: Windows-2022
             vs-generator: x64
             arch: x86_64
