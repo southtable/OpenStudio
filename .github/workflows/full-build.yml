@@ -3,7 +3,7 @@ name: Full Build
 on:
   push:
     branches:
-      - os-4.0-dev-1
+      - os-4.0-dev-2
   pull_request:
     branches:
       - develop
