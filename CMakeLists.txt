@@ -603,6 +603,10 @@ if(MSVC)
   # warning level 3
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W3")
 
+  # Remove unreferenced COMDATs (functions/data) before they reach the linker.
+  # Shrinks object files; does NOT reduce dllexport'd symbol counts (verified empirically).
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:inline")
+
   # warning level 4 - DLM: we should shoot for this
   #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
 
@@ -1237,7 +1241,6 @@ mark_as_advanced(MAXIMIZE_CPU_USAGE)
 if(BUILD_DOCUMENTATION)
   # need doxygen, 1.8.7...<1.8.9 is what it's tested on
   find_package(Doxygen REQUIRED) # Should we do `REQUIRED` dot here?
-  find_package(Python3 3 REQUIRED COMPONENTS Interpreter)
   if(DOXYGEN_VERSION VERSION_LESS 1.8.7 OR DOXYGEN_VERSION VERSION_GREATER_EQUAL 1.8.9)
     message(AUTHOR_WARNING "Found Doxygen version ${DOXYGEN_VERSION}: the historically tested range is 1.8.7...<1.8.9 so it's possible the resulting documentation (CSS or search feature in particular) will be broken (some tests have been conducted with 1.10.0)")
   endif()
@@ -1299,9 +1302,14 @@ if(BUILD_DOCUMENTATION)
       set(DOXYGEN_HTML_HEADER "${PROJECT_SOURCE_DIR}/doc/html/epmodel-header.html")
       set(EPMODEL_CLASS_FAMILIES "${PROJECT_BINARY_DIR}/doc/epmodel_class_families.hpp")
       set(DOXY_ADDITIONAL_DIR "\"${EPMODEL_CLASS_FAMILIES}\"")
+      # Derive this browsing page from the existing source-tree families. The
+      # generation complexity avoids introducing yet another hierarchy for the
+      # model classes through Doxygen groups or additional class metadata.
       set(DOXY_PREPARE_COMMAND
-        COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/developer/python/generate_epmodel_class_families.py"
-          --output "${EPMODEL_CLASS_FAMILIES}"
+        COMMAND "${CMAKE_COMMAND}"
+          "-DOPENSTUDIO_SOURCE_DIR=${PROJECT_SOURCE_DIR}"
+          "-DOUTPUT=${EPMODEL_CLASS_FAMILIES}"
+          -P "${PROJECT_SOURCE_DIR}/CMake/GenerateEPModelClassFamilies.cmake"
       )
     endif()
     configure_file(${PROJECT_SOURCE_DIR}/Doxyfile.in ${PROJECT_BINARY_DIR}/doc/${DOC_NAME}.cfg)
@@ -1703,7 +1711,9 @@ if (MSVC)
     # within the same library. This may result in less efficient function calls.
 
     # The potential inefficiency goes away if we use LTO linking
-    target_link_libraries(openstudiolib PRIVATE -IGNORE:4217,4049)
+    foreach(_os_lib openstudiolib openstudiomodellib openstudioepmodellib openstudioutilitieslib)
+      target_link_libraries(${_os_lib} PRIVATE -IGNORE:4217,4049)
+    endforeach()
     if(CMAKE_SIZEOF_VOID_P EQUAL 8) # only applies to 64 bit windows platforms
       if (BUILD_RUBY_BINDINGS)
         target_link_libraries(openstudio_rb PRIVATE -IGNORE:4217,4049)
