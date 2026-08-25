@@ -3709,10 +3709,16 @@ set(${target_name}_test_src
   test/idf/IDF_SmallOffice_GTest.cpp
 )
 
-set(${target_name}_test_depends
-  openstudiolib
-  openstudio_epmodel
-)
+if(MSVC)
+  set(${target_name}_test_depends
+    openstudiolib
+  )
+else()
+  set(${target_name}_test_depends
+    openstudiolib
+    openstudio_epmodel
+  )
+endif()
 
 CREATE_SRC_GROUPS("${${target_name}_test_src}")
 

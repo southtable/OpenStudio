@@ -27,7 +27,11 @@ add_library(openstudio_workflow
   Timer.cpp
 )
 
-target_link_libraries(openstudio_workflow PUBLIC openstudiolib openstudio_epmodel)
+if(MSVC)
+  target_link_libraries(openstudio_workflow PUBLIC openstudiolib openstudioepmodellib)
+else()
+  target_link_libraries(openstudio_workflow PUBLIC openstudiolib openstudio_epmodel)
+endif()
 
 if(BUILD_TESTING)
   set(openstudio_workflow_test_depends

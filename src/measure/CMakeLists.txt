@@ -60,12 +60,20 @@ target_link_libraries(${target_name} PUBLIC ${${target_name}_depends})
 target_compile_definitions(${target_name} PRIVATE openstudio_measure_EXPORTS SHARED_OS_LIBS)
 add_dependencies(${target_name} GenerateIddFactoryRun)
 
-set(${target_name}_test_depends
-  ${COREFOUNDATION_LIBRARY}
-  openstudiolib
-  openstudio_epmodel
-  fmt::fmt
-)
+if(MSVC)
+  set(${target_name}_test_depends
+    ${COREFOUNDATION_LIBRARY}
+    openstudiolib
+    fmt::fmt
+  )
+else()
+  set(${target_name}_test_depends
+    ${COREFOUNDATION_LIBRARY}
+    openstudiolib
+    openstudio_epmodel
+    fmt::fmt
+  )
+endif()
 
 if( MSVC )
   target_compile_definitions(${target_name} PUBLIC ${WIN_MVC})
