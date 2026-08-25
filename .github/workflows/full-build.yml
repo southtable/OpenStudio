@@ -567,7 +567,10 @@ jobs:
 
   macos-build:
     name: Build Packages for ${{ matrix.pretty }}
-    if: false
+    if: |
+      (!inputs.jobs || contains(inputs.jobs, 'macos-build')) &&
+      (github.event_name == 'push' || github.event_name == 'schedule' ||
+       (github.event_name == 'pull_request' && (github.base_ref == 'develop' || github.base_ref == 'master' || github.base_ref == 'os-4.0-dev')))
     runs-on: ${{ matrix.os }}
     timeout-minutes: 720
     continue-on-error: ${{ matrix.allow_failure }}
@@ -1136,10 +1139,7 @@ jobs:
 
   windows-build:
     name: Build ${{ matrix.pretty }}
-    if: |
-      (!inputs.jobs || contains(inputs.jobs, 'windows-build')) &&
-      (github.event_name == 'push' || github.event_name == 'schedule' ||
-       (github.event_name == 'pull_request' && (github.base_ref == 'develop' || github.base_ref == 'master' || github.base_ref == 'os-4.0-dev')))
+    if: false
     runs-on: ${{ matrix.os }}
     timeout-minutes: 720
     strategy:
