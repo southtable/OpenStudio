@@ -1222,7 +1222,7 @@ jobs:
         include:
           - platform: windows-2022-x64
             pretty: Windows 2022 x64
-            os: windows-2022
+            os: windows-2022-x86_64
             test_suffix: Windows-2022
             vs-generator: x64
             arch: x86_64
